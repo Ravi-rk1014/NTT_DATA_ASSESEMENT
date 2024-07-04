@@ -1,0 +1,187 @@
+openapi: 3.0.0
+info:
+  title: Exoplanet Service API
+  description: API for managing exoplanets and estimating fuel for space voyages.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080
+paths:
+  /exoplanets:
+    post:
+      summary: Add a new exoplanet
+      requestBody:
+        description: Exoplanet to add
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exoplanet'
+      responses:
+        '200':
+          description: Successfully added exoplanet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exoplanet'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    get:
+      summary: List all exoplanets
+      responses:
+        '200':
+          description: List of exoplanets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Exoplanet'
+  /exoplanets/{id}:
+    get:
+      summary: Get an exoplanet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exoplanet details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exoplanet'
+        '404':
+          description: Exoplanet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update an exoplanet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Exoplanet to update
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Exoplanet'
+      responses:
+        '200':
+          description: Successfully updated exoplanet
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Exoplanet'
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Exoplanet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete an exoplanet by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successfully deleted exoplanet
+        '404':
+          description: Exoplanet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /exoplanets/{id}/fuel:
+    get:
+      summary: Estimate fuel cost for a trip to an exoplanet
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: crew
+          in: query
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Fuel cost estimation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fuel:
+                    type: number
+                    format: double
+        '400':
+          description: Invalid input
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Exoplanet not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    Exoplanet:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        distance:
+          type: integer
+        radius:
+          type: number
+          format: double
+        mass:
+          type: number
+          format: double
+        type:
+          type: string
+          enum:
+            - GasGiant
+            - Terrestrial
+      required:
+        - name
+        - description
+        - distance
+        - radius
+        - type
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
